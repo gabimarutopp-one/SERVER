@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kun Tartibi — talaba uchun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12182B; --bg-elevated: #1B2340; --bg-card: #202A4A; --line: #303C63;
+    --amber: #F2A93B; --teal: #4FD1C5; --coral: #E8735F;
+    --text: #F2F0E8; --text-muted: #93A0C4;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.5; }
+  h1,h2,.brand { font-family:'Fraunces',Georgia,serif; }
+  .wrap { max-width:980px; margin:0 auto; padding:28px 20px 60px; }
+  .hidden { display:none !important; }
+
+  /* Auth screen */
+  .auth-overlay { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .auth-card { max-width:400px; width:100%; background:var(--bg-card); border:1px solid var(--line); border-radius:18px; padding:28px; }
+  .auth-tabs { display:flex; gap:8px; margin:16px 0 18px; }
+  .auth-tab { flex:1; background:var(--bg-elevated); border:1px solid var(--line); color:var(--text-muted); padding:9px; border-radius:10px; cursor:pointer; font-size:13.5px; font-family:inherit; }
+  .auth-tab.active { background:var(--amber); color:#1B2340; border-color:var(--amber); font-weight:600; }
+  .auth-card input { width:100%; background:var(--bg-elevated); border:1px solid var(--line); border-radius:10px; padding:10px 12px; color:var(--text); font-size:14px; margin-bottom:10px; font-family:inherit; }
+  .auth-card input:focus { outline:2px solid var(--amber); outline-offset:1px; }
+  .auth-submit { width:100%; background:var(--amber); color:#1B2340; border:none; border-radius:10px; padding:11px; font-weight:600; font-size:14px; cursor:pointer; }
+  .auth-submit:hover { filter:brightness(1.08); }
+  .auth-msg { font-size:13px; color:var(--coral); margin:6px 0 0; min-height:16px; }
+  .auth-hint { font-size:12.5px; color:var(--text-muted); margin-top:14px; }
+
+  header.hero { position:relative; padding:34px 28px; border-radius:18px; background:linear-gradient(160deg,#1B2340 0%,#232C52 60%,#2A3363 100%); border:1px solid var(--line); overflow:hidden; margin-bottom:28px; }
+  .brand { font-size:14px; color:var(--amber); margin:0 0 10px; font-weight:500; }
+  .greeting-time { font-size:clamp(26px,5vw,38px); font-weight:600; margin:0 0 6px; }
+  .hero-sub { color:var(--text-muted); margin:0; font-size:15px; max-width:520px; }
+  .icon-btn { position:absolute; top:20px; background:var(--bg-elevated); border:1px solid var(--line); color:var(--text); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:16px; }
+  #themeToggle { right:20px; } #logoutBtn { right:66px; }
+  .quote-box { display:flex; gap:10px; margin-top:14px; font-size:13.5px; color:var(--text-muted); font-style:italic; align-items:center; }
+  .quote-btn { background:none; border:1px solid var(--line); color:var(--text-muted); border-radius:50%; width:26px; height:26px; cursor:pointer; font-size:13px; flex:none; }
+  .progress-wrap { margin-top:16px; }
+  .progress-labels { display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-muted); margin-bottom:6px; }
+  .progress-labels b { color:var(--amber); }
+  .progress-track { height:8px; border-radius:999px; background:rgba(255,255,255,0.08); overflow:hidden; }
+  .progress-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--amber),var(--teal)); width:0%; transition:width .3s; }
+  .stat-row { display:flex; gap:18px; margin-top:14px; }
+  .stat-pill { text-align:center; }
+  .stat-pill .num { font-family:'Fraunces',serif; font-size:28px; font-weight:600; display:block; }
+  .stat-pill .lbl { font-size:12px; color:var(--text-muted); }
+
+  .grid { display:grid; grid-template-columns:1.1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .grid{grid-template-columns:1fr;} }
+  .card { background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:22px; }
+  .card h2 { font-size:19px; font-weight:600; margin:0 0 4px; }
+  .card-sub { font-size:13px; color:var(--text-muted); margin:0 0 16px; }
+  .notes-card { grid-column:1/-1; }
+  .empty-note { color:var(--text-muted); font-size:13.5px; padding:10px 0; }
+
+  .task-row,.lt-row,.budget-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); }
+  .task-row:last-of-type,.lt-row:last-of-type,.budget-row:last-of-type { border-bottom:none; }
+  .priority-dot { width:10px; height:10px; border-radius:50%; flex:none; cursor:pointer; border:none; padding:0; background:var(--text-muted); align-self:flex-start; margin-top:6px; }
+  .priority-dot[data-p="1"] { background:var(--amber); } .priority-dot[data-p="2"] { background:var(--coral); }
+  .task-check { width:20px; height:20px; border-radius:6px; border:1.5px solid var(--text-muted); background:transparent; flex:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; }
+  .task-check.done { background:var(--teal); border-color:var(--teal); }
+  .task-text { flex:1; font-size:14.5px; } .task-text.done { color:var(--text-muted); text-decoration:line-through; }
+  .del-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px; }
+  .del-btn:hover { color:var(--coral); }
+  .add-row { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .add-row input,.add-row select { background:var(--bg-elevated); border:1px solid var(--line); border-radius:10px; padding:9px 12px; color:var(--text); font-size:13.5px; font-family:inherit; }
+  .add-row input[type=text] { flex:1; min-width:140px; }
+  .add-btn { background:var(--amber); color:#1B2340; border:none; border-radius:10px; padding:0 16px; font-weight:600; font-size:14px; cursor:pointer; }
+
+  .day-tabs { display:flex; gap:6px; overflow-x:auto; padding-bottom:12px; }
+  .day-tab { background:var(--bg-elevated); border:1px solid var(--line); color:var(--text-muted); padding:7px 13px; border-radius:999px; font-size:13px; cursor:pointer; white-space:nowrap; flex:none; }
+  .day-tab.active { background:var(--amber); color:#1B2340; border-color:var(--amber); font-weight:600; }
+  .lesson-row { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); align-items:center; }
+  .lesson-row:last-of-type { border-bottom:none; }
+  .lesson-name-input,.lesson-time-input { background:var(--bg-elevated); border:1px solid var(--line); border-radius:8px; color:var(--text); font-family:inherit; padding:6px 8px; font-size:13.5px; }
+  .lesson-name-input { flex:1; } .lesson-time-input { width:60px; text-align:center; }
+  .add-lesson-btn { margin-top:12px; background:none; border:1px dashed var(--line); color:var(--text-muted); padding:9px; width:100%; border-radius:10px; cursor:pointer; font-size:13.5px; font-family:inherit; }
+
+  .countdown-num { font-family:'Fraunces',serif; font-size:48px; font-weight:600; color:var(--amber); }
+  .countdown-lbl { color:var(--text-muted); font-size:13px; }
+  .countdown-setup { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+  .countdown-setup input { flex:1; min-width:120px; background:var(--bg-elevated); border:1px solid var(--line); border-radius:10px; padding:9px 12px; color:var(--text); font-size:13.5px; }
+
+  .habit-grid { display:grid; grid-template-columns:1fr repeat(7,26px); gap:6px; align-items:center; font-size:12px; }
+  .hg-head { color:var(--text-muted); text-align:center; }
+  .habit-name { font-size:13.5px; display:flex; align-items:center; gap:6px; }
+  .habit-toggle { width:22px; height:22px; border-radius:6px; border:1.5px solid var(--line); background:transparent; cursor:pointer; justify-self:center; }
+  .habit-toggle.on { background:var(--teal); border-color:var(--teal); }
+
+  .lt-text { flex:1; font-size:14px; }
+  .lt-days { font-size:12px; color:var(--amber); background:rgba(242,169,59,0.12); padding:3px 9px; border-radius:999px; flex:none; white-space:nowrap; }
+  .lt-days.overdue { color:var(--coral); background:rgba(232,115,95,0.12); }
+
+  .budget-balance { display:flex; justify-content:space-between; align-items:baseline; padding-bottom:12px; margin-bottom:8px; border-bottom:1px solid var(--line); }
+  .budget-balance .num { font-family:'Fraunces',serif; font-size:24px; font-weight:600; }
+  .budget-row .bnote { flex:1; font-size:13.5px; }
+  .amt.in { color:var(--teal); } .amt.out { color:var(--coral); }
+
+  textarea#notes { width:100%; min-height:110px; background:var(--bg-elevated); border:1px solid var(--line); border-radius:10px; color:var(--text); font-family:inherit; font-size:14px; padding:12px; resize:vertical; }
+  .save-hint { font-size:12px; color:var(--text-muted); margin-top:8px; }
+
+  .assistant-card { grid-column:1/-1; }
+  .chat-log { max-height:320px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px; }
+  .chat-msg { max-width:80%; padding:10px 13px; border-radius:14px; font-size:14px; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+  .chat-msg.user { align-self:flex-end; background:var(--amber); color:#1B2340; border-bottom-right-radius:4px; }
+  .chat-msg.assistant { align-self:flex-start; background:var(--bg-elevated); border:1px solid var(--line); border-bottom-left-radius:4px; }
+  .chat-msg.pending { color:var(--text-muted); font-style:italic; }
+  .chat-msg.error { color:var(--coral); background:transparent; border:1px dashed var(--coral); }
+  .chat-empty { color:var(--text-muted); font-size:13.5px; text-align:center; padding:16px 0; }
+  .chat-input-row { display:flex; gap:8px; margin-top:14px; }
+  .chat-input-row input { flex:1; background:var(--bg-elevated); border:1px solid var(--line); border-radius:10px; padding:10px 12px; color:var(--text); font-size:14px; font-family:inherit; }
+  .chat-input-row input:focus { outline:2px solid var(--amber); outline-offset:1px; }
+
+  :root[data-theme="light"] { --bg:#F7F5EF; --bg-elevated:#FFFFFF; --bg-card:#FFFFFF; --line:#E3DFD3; --text:#211F1B; --text-muted:#766F60; }
+  :root[data-theme="light"] header.hero { background:linear-gradient(160deg,#FFF7E8 0%,#FDEFD9 60%,#FCE6C2 100%); }
+  :root[data-theme="light"] .task-check { color:#fff; }
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="auth-overlay">
+  <div class="auth-card">
+    <p class="brand">Kun tartibi</p>
+    <h1 style="font-size:24px;margin:0;">Xush kelibsiz</h1>
+    <p class="hero-sub" style="margin-top:6px;">Har bir hisob o'z ma'lumotlarini serverda alohida saqlaydi.</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin">Kirish</button>
+      <button class="auth-tab" id="tabRegister">Ro'yxatdan o'tish</button>
+    </div>
+    <form id="authForm">
+      <input id="authUser" type="text" placeholder="Login (3-24 belgi)" autocomplete="username" required>
+      <input id="authPass" type="password" placeholder="Parol (kamida 8 belgi)" autocomplete="current-password" required>
+      <button type="submit" class="auth-submit" id="authSubmitBtn">Kirish</button>
+      <p class="auth-msg" id="authMsg"></p>
+    </form>
+    <p class="auth-hint">Parolingiz serverda xavfsiz xeshlanadi (bcrypt) — hech qayerda ochiq saqlanmaydi.</p>
+  </div>
+</div>
+
+<div class="wrap hidden" id="appRoot">
+  <header class="hero">
+    <button id="logoutBtn" class="icon-btn" aria-label="Chiqish">🚪</button>
+    <button id="themeToggle" class="icon-btn" aria-label="Tema">🌙</button>
+    <p class="brand">Kun tartibi</p>
+    <h1 class="greeting-time" id="greeting">Xayrli kun!</h1>
+    <p class="hero-sub" id="welcomeMsg"></p>
+    <div class="quote-box"><p id="quoteText" style="margin:0;flex:1;"></p><button class="quote-btn" id="quoteBtn">↻</button></div>
+    <div class="progress-wrap">
+      <div class="progress-labels"><span>Bugungi bajarilish</span><b id="progressPct">0%</b></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="stat-row" id="statRow"></div>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Bugungi vazifalar</h2>
+      <p class="card-sub">Nuqtani bosib muhimlikni belgilang</p>
+      <div id="taskList"></div>
+      <div class="add-row"><input id="taskInput" type="text" placeholder="Yangi vazifa" maxlength="140"><button class="add-btn" id="addTaskBtn">Qo'shish</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Dars jadvali</h2>
+      <p class="card-sub">Har kun uchun alohida</p>
+      <div class="day-tabs" id="dayTabs"></div>
+      <div id="lessonList"></div>
+      <button class="add-lesson-btn" id="addLessonBtn">+ Dars qo'shish</button>
+    </section>
+
+    <section class="card">
+      <h2>Imtihongacha sanoq</h2>
+      <p class="card-sub" id="cdSub">Sana belgilang</p>
+      <div class="countdown-num" id="cdNum">—</div>
+      <div class="countdown-lbl" id="cdLbl">Sana tanlanmagan</div>
+      <div class="countdown-setup"><input type="text" id="cdName" placeholder="Nima" maxlength="60"><input type="date" id="cdDate"><button class="add-btn" id="cdSaveBtn">Saqlash</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Odatlar kuzatuvchisi</h2>
+      <p class="card-sub">Haftalik: Dush → Yak</p>
+      <div class="habit-grid" id="habitGrid"></div>
+      <div class="add-row"><input id="habitInput" type="text" placeholder="Yangi odat" maxlength="40"><button class="add-btn" id="addHabitBtn">Qo'shish</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Haftalik / oylik vazifalar</h2>
+      <p class="card-sub">Muddat bo'yicha tartiblanadi</p>
+      <div id="ltList"></div>
+      <div class="add-row"><input id="ltText" type="text" placeholder="Vazifa" maxlength="120"><input type="date" id="ltDate"><button class="add-btn" id="ltAddBtn">Qo'shish</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Byudjet kuzatuvchisi</h2>
+      <p class="card-sub">Kirim/chiqimlar</p>
+      <div class="budget-balance"><span>Joriy balans</span><span class="num" id="budgetBalance">0 so'm</span></div>
+      <div id="budgetList"></div>
+      <div class="add-row">
+        <select id="budgetType"><option value="in">Kirim</option><option value="out">Chiqim</option></select>
+        <input id="budgetAmount" type="number" placeholder="Summa" min="0" style="width:100px;">
+        <input id="budgetNote" type="text" placeholder="Izoh" maxlength="60">
+        <button class="add-btn" id="budgetAddBtn">Qo'shish</button>
+      </div>
+    </section>
+
+    <section class="card assistant-card">
+      <h2>AI Yordamchi</h2>
+      <p class="card-sub">Bugungi jadval, vazifalar va byudjetingizni ko'rib turadi</p>
+      <div class="chat-log" id="chatLog"><p class="chat-empty">Savol bering — masalan: "Bugun nimadan boshlasam bo'ladi?"</p></div>
+      <div class="chat-input-row">
+        <input id="chatInput" type="text" placeholder="Yordamchiga yozing..." maxlength="2000">
+        <button class="add-btn" id="chatSendBtn">Yuborish</button>
+      </div>
+    </section>
+
+    <section class="card notes-card">
+      <h2>Qisqa eslatmalar</h2>
+      <textarea id="notes" placeholder="Bu yerga yozing..."></textarea>
+      <p class="save-hint">Serverga avtomatik saqlanadi</p>
+    </section>
+  </div>
+</div>
+
+<script>
+const DAYS = ["Dush","Sesh","Chor","Pay","Juma","Shan","Yak"];
+const todayIdx = (new Date().getDay() + 6) % 7;
+let state = null;
+let saveTimer = null;
+
+// ---------- Theme ----------
+const themeBtn = document.getElementById('themeToggle');
+function applyTheme(t) { document.documentElement.setAttribute('data-theme', t); themeBtn.textContent = t === 'light' ? '🌙' : '☀️'; }
+applyTheme(localStorage.getItem('kt_theme') || 'dark');
+themeBtn.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  localStorage.setItem('kt_theme', next); applyTheme(next);
+});
+
+// ---------- Quotes ----------
+const QUOTES = ["Bugun qilgan mehnating ertangi natijang.","Kichik qadamlar katta maqsadlarga olib boradi.","Bilim — hech kim tortib ololmaydigan boylik.","Charchaganingda emas, to'xtaganingda mag'lub bo'lasan.","Har bir mutaxassis avval boshlovchi edi.","Intizom — orzu bilan natija o'rtasidagi ko'prik.","Bugungi tirishqoqlik — ertangi erkinlik.","Sekin yur, lekin hech qachon orqaga qaytma.","O'zingga ishon, boshqalar keyin ishonadi.","Vaqt eng adolatli o'qituvchi."];
+function showQuote(){ document.getElementById('quoteText').textContent = '"' + QUOTES[Math.floor(Math.random()*QUOTES.length)] + '"'; }
+document.getElementById('quoteBtn').addEventListener('click', showQuote);
+
+// ---------- Auth ----------
+let authMode = 'login';
+const authForm = document.getElementById('authForm');
+const authMsg = document.getElementById('authMsg');
+document.getElementById('tabLogin').addEventListener('click', () => setAuthMode('login'));
+document.getElementById('tabRegister').addEventListener('click', () => setAuthMode('register'));
+function setAuthMode(mode) {
+  authMode = mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+  document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Kirish' : 'Ro\'yxatdan o\'tish';
+  document.getElementById('authPass').autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+  authMsg.textContent = '';
+}
+authForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  authMsg.textContent = '';
+  const username = document.getElementById('authUser').value.trim();
+  const password = document.getElementById('authPass').value;
+  try {
+    const res = await fetch('/api/' + authMode, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { authMsg.textContent = data.message || 'Xatolik yuz berdi'; return; }
+    document.getElementById('welcomeMsg').textContent = 'Xush kelibsiz, ' + data.username + '!';
+    await enterApp();
+  } catch (err) { authMsg.textContent = 'Serverga ulanib bo\'lmadi'; }
+});
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST' });
+  location.reload();
+});
+
+async function enterApp() {
+  const dataRes = await fetch('/api/data');
+  if (!dataRes.ok) { location.reload(); return; }
+  state = await dataRes.json();
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('appRoot').classList.remove('hidden');
+  const hour = new Date().getHours();
+  document.getElementById('greeting').textContent = hour < 5 ? 'Xayrli tun!' : hour < 12 ? 'Xayrli tong!' : hour < 17 ? 'Xayrli kun!' : hour < 22 ? 'Xayrli kech!' : 'Xayrli tun!';
+  showQuote();
+  renderAll();
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    fetch('/api/data', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state) });
+  }, 400);
+}
+
+function renderAll() {
+  renderTasks(); renderSchedule(); renderCountdown(); renderHabits(); renderLongTasks(); renderBudget();
+  document.getElementById('notes').value = state.notes || '';
+}
+
+// ---------- Tasks ----------
+const taskListEl = document.getElementById('taskList');
+function renderTasks() {
+  taskListEl.innerHTML = '';
+  if (state.tasks.length === 0) { taskListEl.innerHTML = '<p class="empty-note">Hozircha vazifa yo\'q.</p>'; }
+  state.tasks.forEach((t, i) => {
+    const row = document.createElement('div'); row.className = 'task-row';
+    row.innerHTML = `<button class="priority-dot" data-p="${t.priority||0}"></button><button class="task-check ${t.done?'done':''}">${t.done?'✓':''}</button><span class="task-text ${t.done?'done':''}"></span><button class="del-btn">×</button>`;
+    row.querySelector('.task-text').textContent = t.text;
+    row.querySelector('.priority-dot').onclick = () => { t.priority = ((t.priority||0)+1)%3; renderTasks(); scheduleSave(); };
+    row.querySelector('.task-check').onclick = () => { t.done = !t.done; renderTasks(); scheduleSave(); };
+    row.querySelector('.del-btn').onclick = () => { state.tasks.splice(i,1); renderTasks(); scheduleSave(); };
+    taskListEl.appendChild(row);
+  });
+  const total = state.tasks.length, done = state.tasks.filter(t=>t.done).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('progressPct').textContent = pct+'%';
+  document.getElementById('progressFill').style.width = pct+'%';
+  const urgent = state.tasks.filter(t=>!t.done && t.priority===2).length;
+  document.getElementById('statRow').innerHTML = `<div class="stat-pill"><span class="num">${total}</span><span class="lbl">jami</span></div><div class="stat-pill"><span class="num">${done}</span><span class="lbl">bajarildi</span></div><div class="stat-pill"><span class="num">${urgent}</span><span class="lbl">shoshilinch</span></div>`;
+}
+document.getElementById('addTaskBtn').onclick = () => {
+  const input = document.getElementById('taskInput'); const v = input.value.trim();
+  if (!v) return; state.tasks.push({text:v,done:false,priority:0}); input.value=''; renderTasks(); scheduleSave();
+};
+document.getElementById('taskInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('addTaskBtn').click(); });
+
+// ---------- Schedule ----------
+let activeDay = todayIdx;
+function renderSchedule() {
+  const tabsEl = document.getElementById('dayTabs'); tabsEl.innerHTML = '';
+  DAYS.forEach((d,i) => { const b=document.createElement('button'); b.className='day-tab'+(i===activeDay?' active':''); b.textContent=d; b.onclick=()=>{activeDay=i;renderSchedule();}; tabsEl.appendChild(b); });
+  const listEl = document.getElementById('lessonList'); listEl.innerHTML = '';
+  const list = state.schedule[activeDay] || [];
+  if (list.length === 0) { listEl.innerHTML = '<p class="empty-note">Dars yo\'q.</p>'; return; }
+  list.forEach((l,i) => {
+    const row = document.createElement('div'); row.className='lesson-row';
+    row.innerHTML = `<input class="lesson-time-input" value="${escapeAttr(l.time)}" placeholder="9:00" maxlength="5"><input class="lesson-name-input" value="${escapeAttr(l.name)}" placeholder="Fan" maxlength="80"><button class="del-btn">×</button>`;
+    row.querySelector('.lesson-time-input').oninput = e => { l.time = e.target.value; scheduleSave(); };
+    row.querySelector('.lesson-name-input').oninput = e => { l.name = e.target.value; scheduleSave(); };
+    row.querySelector('.del-btn').onclick = () => { list.splice(i,1); renderSchedule(); scheduleSave(); };
+    listEl.appendChild(row);
+  });
+}
+function escapeAttr(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+document.getElementById('addLessonBtn').onclick = () => { if(!state.schedule[activeDay]) state.schedule[activeDay]=[]; state.schedule[activeDay].push({time:'',name:''}); renderSchedule(); scheduleSave(); };
+
+// ---------- Countdown ----------
+function renderCountdown() {
+  const cd = state.countdown;
+  const num=document.getElementById('cdNum'), lbl=document.getElementById('cdLbl'), sub=document.getElementById('cdSub');
+  if (cd) { document.getElementById('cdName').value = cd.name||''; document.getElementById('cdDate').value = cd.date||''; }
+  if (!cd || !cd.date) { num.textContent='—'; lbl.textContent='Sana tanlanmagan'; sub.textContent='Sana belgilang'; return; }
+  const target = new Date(cd.date+'T00:00:00'); const t0=new Date(); t0.setHours(0,0,0,0);
+  const diff = Math.round((target-t0)/86400000);
+  sub.textContent = cd.name || 'Belgilangan sana';
+  if (diff>0){ num.textContent=diff; lbl.textContent='kun qoldi'; } else if(diff===0){ num.textContent='Bugun'; lbl.textContent='Omad tilaymiz!'; } else { num.textContent='✓'; lbl.textContent='O\'tib ketdi'; }
+}
+document.getElementById('cdSaveBtn').onclick = () => {
+  const date = document.getElementById('cdDate').value; if (!date) return;
+  state.countdown = { name: document.getElementById('cdName').value.trim(), date }; renderCountdown(); scheduleSave();
+};
+
+// ---------- Habits ----------
+function weekKey(){ const d=new Date(); const j=new Date(d.getFullYear(),0,1); const w=Math.ceil((((d-j)/86400000)+j.getDay()+1)/7); return d.getFullYear()+'-'+w; }
+const currentWeek = weekKey();
+function renderHabits() {
+  const el = document.getElementById('habitGrid'); el.innerHTML='';
+  el.appendChild(document.createElement('div'));
+  DAYS.forEach(d=>{ const h=document.createElement('div'); h.className='hg-head'; h.textContent=d[0]; el.appendChild(h); });
+  if (state.habits.length===0){ const p=document.createElement('p'); p.className='empty-note'; p.textContent="Odat yo'q."; p.style.gridColumn='1/-1'; el.appendChild(p); return; }
+  state.habits.forEach((h,hi)=>{
+    if(!h.weeks) h.weeks={}; if(!h.weeks[currentWeek]) h.weeks[currentWeek]=[false,false,false,false,false,false,false];
+    const nameEl=document.createElement('div'); nameEl.className='habit-name';
+    nameEl.innerHTML='<span></span><button class="del-btn">×</button>';
+    nameEl.querySelector('span').textContent=h.name;
+    nameEl.querySelector('.del-btn').onclick=()=>{ state.habits.splice(hi,1); renderHabits(); scheduleSave(); };
+    el.appendChild(nameEl);
+    for(let di=0;di<7;di++){ const b=document.createElement('button'); b.className='habit-toggle'+(h.weeks[currentWeek][di]?' on':''); b.onclick=()=>{ h.weeks[currentWeek][di]=!h.weeks[currentWeek][di]; renderHabits(); scheduleSave(); }; el.appendChild(b); }
+  });
+}
+document.getElementById('addHabitBtn').onclick = () => { const i=document.getElementById('habitInput'); const v=i.value.trim(); if(!v) return; state.habits.push({name:v,weeks:{}}); i.value=''; renderHabits(); scheduleSave(); };
+
+// ---------- Long-term tasks ----------
+function renderLongTasks() {
+  const el = document.getElementById('ltList'); el.innerHTML='';
+  if (state.longtasks.length===0){ el.innerHTML='<p class="empty-note">Yo\'q.</p>'; return; }
+  const sorted = state.longtasks.map((t,i)=>Object.assign({},t,{_i:i})).sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+  sorted.forEach(t=>{
+    const row=document.createElement('div'); row.className='lt-row';
+    let lbl='',over=false;
+    if(t.date){ const target=new Date(t.date+'T00:00:00'); const t0=new Date(); t0.setHours(0,0,0,0); const diff=Math.round((target-t0)/86400000);
+      if(diff<0){lbl="o'tib ketdi";over=true;} else if(diff===0) lbl='bugun'; else lbl=diff+' kun'; }
+    row.innerHTML='<span class="lt-text"></span><span class="lt-days"></span><button class="del-btn">×</button>';
+    row.querySelector('.lt-text').textContent=t.text;
+    const d=row.querySelector('.lt-days'); d.textContent=lbl; if(over) d.classList.add('overdue');
+    row.querySelector('.del-btn').onclick=()=>{ state.longtasks.splice(t._i,1); renderLongTasks(); scheduleSave(); };
+    el.appendChild(row);
+  });
+}
+document.getElementById('ltAddBtn').onclick = () => {
+  const ti=document.getElementById('ltText'), di=document.getElementById('ltDate'); const v=ti.value.trim(); if(!v) return;
+  state.longtasks.push({text:v,date:di.value}); ti.value=''; di.value=''; renderLongTasks(); scheduleSave();
+};
+
+// ---------- Budget ----------
+function renderBudget() {
+  const el = document.getElementById('budgetList'); el.innerHTML=''; let bal=0;
+  if (state.budget.length===0){ el.innerHTML='<p class="empty-note">Yozuv yo\'q.</p>'; }
+  state.budget.forEach((b,i)=>{
+    bal += b.type==='in'?b.amount:-b.amount;
+    const row=document.createElement('div'); row.className='budget-row';
+    row.innerHTML='<span class="bnote"></span><span class="amt"></span><button class="del-btn">×</button>';
+    row.querySelector('.bnote').textContent = b.note || (b.type==='in'?'Kirim':'Chiqim');
+    const a=row.querySelector('.amt'); a.classList.add(b.type); a.textContent=(b.type==='in'?'+':'-')+b.amount.toLocaleString()+" so'm";
+    row.querySelector('.del-btn').onclick=()=>{ state.budget.splice(i,1); renderBudget(); scheduleSave(); };
+    el.appendChild(row);
+  });
+  document.getElementById('budgetBalance').textContent = bal.toLocaleString()+" so'm";
+}
+document.getElementById('budgetAddBtn').onclick = () => {
+  const type=document.getElementById('budgetType').value, ai=document.getElementById('budgetAmount'), ni=document.getElementById('budgetNote');
+  const amount=parseFloat(ai.value); if(!amount||amount<=0) return;
+  state.budget.push({type,amount,note:ni.value.trim()}); ai.value=''; ni.value=''; renderBudget(); scheduleSave();
+};
+
+// ---------- AI Assistant ----------
+let chatHistory = []; // {role:'user'|'assistant', content} — kept client-side only, resets on reload
+const chatLogEl = document.getElementById('chatLog');
+function renderChat() {
+  chatLogEl.innerHTML = '';
+  if (chatHistory.length === 0) {
+    chatLogEl.innerHTML = '<p class="chat-empty">Savol bering — masalan: "Bugun nimadan boshlasam bo\'ladi?"</p>';
+    return;
+  }
+  chatHistory.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + m.role + (m.pending ? ' pending' : '') + (m.error ? ' error' : '');
+    div.textContent = m.content;
+    chatLogEl.appendChild(div);
+  });
+  chatLogEl.scrollTop = chatLogEl.scrollHeight;
+}
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  chatHistory.push({ role: 'user', content: text });
+  const pendingMsg = { role: 'assistant', content: 'Yozmoqda...', pending: true };
+  chatHistory.push(pendingMsg);
+  renderChat();
+  try {
+    const res = await fetch('/api/assistant', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history: chatHistory.filter(m => !m.pending).slice(0, -1) })
+    });
+    const data = await res.json();
+    chatHistory.pop();
+    if (!res.ok) {
+      chatHistory.push({ role: 'assistant', content: data.message || 'Xatolik yuz berdi.', error: true });
+    } else {
+      chatHistory.push({ role: 'assistant', content: data.reply });
+    }
+  } catch (e) {
+    chatHistory.pop();
+    chatHistory.push({ role: 'assistant', content: 'Serverga ulanib bo\'lmadi.', error: true });
+  }
+  renderChat();
+}
+document.getElementById('chatSendBtn').addEventListener('click', sendChat);
+document.getElementById('chatInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+// ---------- Notes ----------
+document.getElementById('notes').addEventListener('input', e => { state.notes = e.target.value; scheduleSave(); });
+
+// ---------- Boot ----------
+(async function boot(){
+  try {
+    const me = await fetch('/api/me');
+    if (me.ok) { await enterApp(); return; }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
